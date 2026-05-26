@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="midnight">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vectorless RAG</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/js/tailwind-config.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="/css/premium-overrides.css" />
+  <link rel="stylesheet" href="/css/reference-theme.css" />
+  <link rel="stylesheet" href="/css/layout-system.css" />
+  <link rel="stylesheet" href="/css/mock-reference-ui.css" />
+  <style>
+    /* Critical layout — works even if main.css fails to load */
+    html, body { margin: 0; min-height: 100%; }
+    body {
+      font-family: "Inter", "Plus Jakarta Sans", system-ui, sans-serif;
+      background: #0a0a0f;
+      color: #ececf1;
+    }
+    #auth-screen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      box-sizing: border-box;
+    }
+    #auth-screen .auth-card {
+      width: 100%;
+      max-width: 420px;
+      margin: 0 auto;
+      padding: 32px;
+      background: #1a1a26;
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 20px;
+      box-sizing: border-box;
+    }
+    #auth-screen .auth-brand { text-align: center; margin-bottom: 24px; }
+    #auth-screen .logo-mark { display: block; font-size: 2.5rem; color: #a78bfa; line-height: 1; margin-bottom: 8px; }
+    #auth-screen .auth-brand h1 { margin: 8px 0 0; font-size: 1.5rem; color: #ececf1; }
+    #auth-screen .auth-brand p { margin: 8px 0 0; color: #8b8b9e; font-size: 0.9rem; }
+    #auth-screen .auth-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    #auth-screen .auth-tab {
+      flex: 1;
+      padding: 10px 12px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 10px;
+      background: transparent;
+      color: #8b8b9e;
+      cursor: pointer;
+      font: inherit;
+      font-size: 0.9rem;
+    }
+    #auth-screen .auth-tab.active {
+      background: #a78bfa;
+      color: #0a0a0f;
+      border-color: #a78bfa;
+      font-weight: 600;
+    }
+    #auth-screen .field { margin-bottom: 16px; }
+    #auth-screen .field label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: #8b8b9e;
+      margin-bottom: 6px;
+    }
+    #auth-screen .field input {
+      display: block;
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 10px;
+      background: #12121a;
+      color: #ececf1;
+      font: inherit;
+      font-size: 1rem;
+      box-sizing: border-box;
+    }
+    #auth-screen .field input:focus {
+      outline: 2px solid rgba(167,139,250,.5);
+      border-color: #a78bfa;
+    }
+    #auth-screen .btn-submit {
+      display: block;
+      width: 100%;
+      margin-top: 8px;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #a78bfa, #6366f1);
+      color: #fff;
+      font: inherit;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      box-sizing: border-box;
+    }
+    #auth-screen .btn-submit:hover { filter: brightness(1.08); }
+    #auth-screen .form-error { color: #f87171; font-size: 0.85rem; margin: 0 0 12px; }
+    .hidden { display: none !important; }
+    /* App shell — layout must work on desktop and mobile */
+    #app-shell.app-shell {
+      display: flex;
+      flex-direction: row;
+      width: 100%;
+      height: 100vh;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+    #app-shell .workspace {
+      flex: 1 1 0;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    #app-shell .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+    #app-shell .page-inner {
+      width: 100%;
+      max-width: 52rem;
+      margin: 0 auto;
+      padding: 0 1.5rem 1.5rem;
+      box-sizing: border-box;
+    }
+    #app-shell form#chat-form.composer {
+      width: 100%;
+      max-width: 42rem;
+      margin: 0 auto;
+      box-sizing: border-box;
+    }
+    #app-shell .composer textarea {
+      flex: 1;
+      min-width: 0;
+      width: 100%;
+    }
+    #app-shell .select-bar {
+      display: block;
+      width: 100%;
+      padding: 0.65rem 0.75rem;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 10px;
+      background: #12121a;
+      color: #ececf1;
+      font: inherit;
+      box-sizing: border-box;
+    }
+  </style>
+</head>
+<body>
+  <div id="auth-screen" class="auth-screen">
+    <div class="auth-card">
+      <div class="auth-brand">
+        <span class="logo-mark">&#9672;</span>
+        <h1>Vectorless RAG</h1>
+        <p>Sign in to access your document workspace</p>
+      </div>
+
+      <div class="auth-tabs">
+        <button type="button" class="auth-tab active" data-auth-tab="login">Sign in</button>
+        <button type="button" class="auth-tab" data-auth-tab="register">Create account</button>
+      </div>
+
+      <form id="login-form" class="auth-form" novalidate>
+        <div class="field">
+          <label for="login-user">Username</label>
+          <input type="text" id="login-user" autocomplete="username" required />
+        </div>
+        <div class="field">
+          <label for="login-pass">Password</label>
+          <input type="password" id="login-pass" autocomplete="current-password" required />
+        </div>
+        <p id="login-error" class="form-error hidden"></p>
+        <button type="submit" class="btn-submit">Sign in</button>
+      </form>
+
+      <form id="register-form" class="auth-form hidden" novalidate>
+        <div class="field">
+          <label for="reg-user">Username</label>
+          <input type="text" id="reg-user" autocomplete="username" required minlength="3" />
+        </div>
+        <div class="field">
+          <label for="reg-email">Email</label>
+          <input type="email" id="reg-email" autocomplete="email" required />
+        </div>
+        <div class="field">
+          <label for="reg-pass">Password</label>
+          <input type="password" id="reg-pass" autocomplete="new-password" required minlength="6" />
+        </div>
+        <p id="register-error" class="form-error hidden"></p>
+        <button type="submit" class="btn-submit">Create account</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="app-shell" class="app-shell app-shell-premium hidden">
+    <div class="app-ambient" aria-hidden="true"></div>
+    <aside class="sidebar">
+      <div class="sidebar-brand-row">
+        <div class="sidebar-brand-mark" aria-hidden="true">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5L12 3z"/><path d="M5 19h14"/></svg>
+        </div>
+        <div class="sidebar-brand-text">
+          <strong>AI Tool</strong>
+          <span>Document workspace</span>
+        </div>
+      </div>
+      <nav class="sidebar-nav" aria-label="Primary">
+        <button type="button" class="nav-item active" data-page="chat">
+          <span class="nav-icon-wrap"><i data-lucide="message-square"></i></span>
+          Chat
+        </button>
+        <button type="button" class="nav-item" data-page="documents">
+          <span class="nav-icon-wrap"><i data-lucide="files"></i></span>
+          Documents
+        </button>
+        <button type="button" class="nav-item" data-page="notebook">
+          <span class="nav-icon-wrap"><i data-lucide="book-open"></i></span>
+          Notebook
+        </button>
+        <button type="button" class="nav-item" data-page="compare">
+          <span class="nav-icon-wrap"><i data-lucide="git-compare"></i></span>
+          Compare
+        </button>
+        <button type="button" class="nav-item" data-page="knowledge-map">
+          <span class="nav-icon-wrap"><i data-lucide="network"></i></span>
+          Knowledge Map
+        </button>
+        <button type="button" class="nav-item" data-page="timeline">
+          <span class="nav-icon-wrap"><i data-lucide="clock"></i></span>
+          Timeline
+        </button>
+        <button type="button" class="nav-item" data-page="tools">
+          <span class="nav-icon-wrap"><i data-lucide="wrench"></i></span>
+          Tools
+        </button>
+      </nav>
+      <button type="button" class="btn btn-new-chat" id="btn-new-chat">+ New chat</button>
+      <div class="chat-history">
+        <p class="sidebar-label">Recent chats</p>
+        <div id="thread-list"></div>
+        <button type="button" class="sidebar-view-all-chats" id="btn-view-all-chats">View all chats</button>
+      </div>
+      <div class="sidebar-footer">
+        <button type="button" class="sidebar-user-card" id="btn-sidebar-account" aria-label="Account and settings">
+          <span id="sidebar-footer-avatar" class="sidebar-footer-avatar">U</span>
+          <div class="sidebar-user-meta">
+            <strong id="sidebar-footer-name">User</strong>
+            <span class="sidebar-plan-pill"><i data-lucide="crown" class="sidebar-plan-icon"></i> Workspace</span>
+          </div>
+          <i data-lucide="chevron-down" class="sidebar-user-chevron"></i>
+        </button>
+      </div>
+    </aside>
+
+    <div class="workspace">
+      <header class="header">
+        <button type="button" class="btn-menu" id="btn-menu" aria-label="Open menu">&#9776;</button>
+        <h2 id="page-title">Chat</h2>
+        <div class="header-center">
+          <label class="header-search-wrap" title="Focus ask box (Ctrl+K)">
+            <i data-lucide="search" style="width:1rem;height:1rem;flex-shrink:0;opacity:.7"></i>
+            <input type="search" id="header-search-input" placeholder="Search anything in your documents…" autocomplete="off" />
+            <kbd>Ctrl</kbd><kbd>K</kbd>
+          </label>
+        </div>
+        <div class="header-actions">
+          <button type="button" class="header-icon-btn" id="btn-header-theme" title="Cycle theme" aria-label="Cycle theme">
+            <i data-lucide="moon"></i>
+          </button>
+          <button type="button" class="header-icon-btn header-bell-wrap" title="Notifications" aria-label="Notifications">
+            <i data-lucide="bell"></i>
+            <span class="header-notif-dot" aria-hidden="true"></span>
+          </button>
+          <button type="button" class="header-icon-btn" id="btn-header-help" aria-label="Help" title="Shortcuts &amp; tips">
+            <i data-lucide="help-circle"></i>
+          </button>
+        </div>
+        <div class="header-profile">
+          <button type="button" class="profile-btn" id="profile-btn" aria-haspopup="menu" aria-expanded="false" aria-controls="profile-menu">
+            <span class="profile-avatar" id="header-avatar">U</span>
+            <span class="profile-label" id="header-name">User</span>
+            <span class="chevron">&#9662;</span>
+          </button>
+          <div id="profile-menu" class="profile-menu hidden" role="menu" aria-label="Account menu">
+            <div class="profile-menu-header">
+              <strong id="menu-name">User</strong>
+              <span id="menu-email" class="menu-email"></span>
+            </div>
+            <div class="profile-menu-scroll">
+              <div class="menu-section">
+                <span class="menu-section-title">Theme</span>
+                <div id="theme-grid" class="theme-grid"></div>
+              </div>
+            </div>
+            <div class="profile-menu-actions">
+              <button type="button" class="menu-item" id="btn-open-history" role="menuitem">History</button>
+              <button type="button" class="menu-item menu-danger" id="btn-signout" role="menuitem">Sign out</button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div class="workspace-stack">
+        <div class="workspace-main">
+
+      <section id="page-chat" class="page active">
+        <div class="chat-layout">
+        <div class="chat-area" id="chat-messages"></div>
+        <div class="composer-dock">
+        <form id="chat-form" class="composer">
+          <div class="composer-doc-row">
+            <label class="field-label composer-doc-label" for="chat-source">Document</label>
+            <select id="chat-source" class="select-bar composer-doc-select" title="Which indexed document to use">
+              <option value="">All documents</option>
+            </select>
+            <button type="button" class="btn btn-ghost btn-sm" id="btn-goto-documents" title="Upload or manage files">Upload</button>
+          </div>
+          <div id="voice-input-bar" class="voice-input-bar hidden" aria-live="polite">
+            <span class="voice-input-pulse" aria-hidden="true"></span>
+            <span class="voice-input-status" id="voice-input-status">Listening…</span>
+            <span class="voice-input-hint muted">Your words appear below as you speak</span>
+            <div class="voice-input-actions">
+              <button type="button" class="btn btn-ghost btn-sm" id="btn-voice-cancel">Cancel</button>
+              <button type="button" class="btn btn-primary btn-sm" id="btn-voice-done">Done</button>
+            </div>
+          </div>
+          <div class="composer-input-row">
+            <button type="button" class="btn btn-ghost btn-mic" id="btn-mic" title="Voice to text — click and speak" aria-label="Voice to text">
+              <svg class="mic-icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+                <path fill="currentColor" d="M12 14a3 3 0 0 0 3-3V5a3 3 0 1 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2z"/>
+              </svg>
+            </button>
+            <textarea id="chat-question" rows="1" placeholder="Ask anything about your documents." required></textarea>
+            <button type="submit" class="btn btn-primary" id="chat-submit">Send</button>
+          </div>
+          <p class="composer-footnote">AI can make mistakes. Consider checking important information.</p>
+        </form>
+        </div>
+        </div>
+      </section>
+
+      <section id="page-documents" class="page">
+        <div class="page-inner docs-page">
+        <div class="docs-layout">
+          <div class="docs-main ref-docs-stack">
+        <article class="ref-doc-hero">
+          <div class="ref-doc-hero-copy">
+            <p class="ref-doc-hero-kicker muted">Today</p>
+            <h2 class="ref-doc-hero-title" id="doc-hero-greeting">Good afternoon 👋</h2>
+            <p class="ref-doc-hero-sub muted">Upload your documents and start asking questions grounded in your files.</p>
+            <button type="button" class="btn btn-primary ref-doc-hero-cta" id="btn-hero-new-chat">+ New chat</button>
+          </div>
+          <div class="ref-doc-hero-visual" aria-hidden="true">
+            <div class="ref-doc-robot">
+              <div class="ref-doc-robot-face"></div>
+            </div>
+          </div>
+        </article>
+        <section class="doc-stats-row shell-card-group" aria-label="Library snapshot">
+          <article class="doc-stat-chip">
+            <span class="doc-stat-value" id="doc-stat-indexed">0</span>
+            <span class="doc-stat-label">Indexed docs</span>
+          </article>
+          <article class="doc-stat-chip">
+            <span class="doc-stat-value" id="doc-stat-queue">0</span>
+            <span class="doc-stat-label">Queued</span>
+          </article>
+          <article class="doc-stat-chip">
+            <span class="doc-stat-value" id="doc-stat-segments">—</span>
+            <span class="doc-stat-label">Est. segments</span>
+          </article>
+          <article class="doc-stat-chip">
+            <span class="doc-stat-value" id="doc-stat-processor">Ready</span>
+            <span class="doc-stat-label">Indexer</span>
+          </article>
+        </section>
+        <section class="panel ref-upload-panel">
+          <header class="ref-upload-heading">
+            <h3 class="ref-upload-heading-title">Upload documents</h3>
+            <p class="muted ref-upload-heading-sub">Add PDF or TXT files to your library</p>
+          </header>
+          <div class="upload-zone ref-upload-zone" id="upload-zone" role="button" tabindex="0" aria-label="Upload PDF or TXT files">
+            <span class="ref-upload-cloud" aria-hidden="true"><i data-lucide="upload-cloud"></i></span>
+            <input type="file" id="file-input" accept=".pdf,.txt" multiple hidden />
+            <p class="upload-zone-title ref-upload-title">Drag & drop your files here — or browse</p>
+            <button type="button" class="btn btn-primary btn-browse-files" id="btn-browse-docs">Browse files</button>
+            <p class="muted upload-zone-sub upload-zone-hint">Supports: PDF, TXT • Max 50MB per file • queue multiple</p>
+          </div>
+          <ul id="pending-upload-list" class="pending-upload-list hidden" aria-live="polite"></ul>
+          <div class="docs-upload-actions">
+            <button type="button" class="btn btn-primary" id="btn-upload" disabled>Index selected files</button>
+            <button type="button" class="btn btn-ghost btn-sm hidden" id="btn-clear-pending">Clear queue</button>
+          </div>
+          <p id="upload-status" class="status-text" role="status"></p>
+        </section>
+        <section class="panel ref-library-panel">
+          <header class="ref-library-toolbar">
+            <div class="ref-library-toolbar-left">
+              <h3 class="ref-library-title">Your documents</h3>
+              <span id="doc-count-badge" class="indexed-pill-badge">0</span>
+              <span id="doc-count" class="muted doc-count-caption hidden"></span>
+            </div>
+            <button type="button" class="btn btn-ghost btn-sm ref-library-link" id="btn-doc-scroll">View all</button>
+          </header>
+          <ul id="doc-list" class="doc-list ref-doc-grid"></ul>
+          <p id="doc-empty" class="muted ref-doc-empty hidden">No documents yet — upload PDF or TXT files above.</p>
+        </section>
+        <div id="doc-activity-wrap" class="doc-activity-wrap hidden">
+          <p class="doc-activity-heading">Recent activity</p>
+          <div id="doc-activity" class="doc-activity-strip"><div id="doc-activity-inner" class="doc-activity-inner"></div></div>
+        </div>
+          </div>
+          <aside class="summary-sidebar hidden" id="summary-sidebar" aria-label="Document summaries">
+            <div class="summary-sidebar-head">
+              <h3 class="summary-sidebar-title">Outline</h3>
+              <p id="summary-doc-name" class="summary-doc-name muted"></p>
+            </div>
+            <div id="summary-tree" class="summary-tree" role="tree"></div>
+            <article id="summary-detail" class="summary-detail hidden">
+              <div class="summary-detail-head">
+                <span id="summary-detail-kind" class="summary-kind-badge">section</span>
+                <h4 id="summary-detail-title"></h4>
+                <span id="summary-tts-mount" class="summary-tts-mount"></span>
+              </div>
+              <p id="summary-detail-body" class="summary-detail-body"></p>
+              <p id="summary-detail-preview" class="summary-detail-preview muted hidden"></p>
+            </article>
+          </aside>
+        </div>
+        </div>
+      </section>
+
+      <section id="page-notes" class="page">
+        <div class="page-inner notes-page">
+          <div class="notes-shell">
+          <div class="panel notes-panel-config">
+            <h3>AI Notes Generator</h3>
+            <p class="muted notes-intro">Generate study notes from your indexed documents using the document hierarchy.</p>
+            <label class="field-label" for="notes-source">Document</label>
+            <select id="notes-source" class="select-bar"><option value="">Select document…</option></select>
+            <label class="field-label" for="notes-scope">Scope</label>
+            <select id="notes-scope" class="select-bar">
+              <option value="chapter">Chapter-wise (sections)</option>
+              <option value="topic">Topic-wise (tree topics)</option>
+              <option value="page">Page-wise (leaves)</option>
+            </select>
+            <label class="field-label" for="notes-style">Style</label>
+            <select id="notes-style" class="select-bar">
+              <option value="bullets">Bullet notes</option>
+              <option value="exam">Exam notes</option>
+              <option value="concepts">Key concepts</option>
+              <option value="definitions">Definitions</option>
+            </select>
+            <label class="field-label" for="notes-focus">Focus (optional)</label>
+            <input type="text" id="notes-focus" class="note-title-input" placeholder="e.g. revenue, chapter 2" />
+            <div class="notes-actions">
+              <button type="button" class="btn btn-primary btn-sm" id="btn-notes-generate">Generate notes</button>
+              <button type="button" class="btn btn-ghost btn-sm" id="btn-notes-export-pdf" disabled>Export PDF</button>
+              <button type="button" class="btn btn-ghost btn-sm" id="btn-notes-export-docx" disabled>Export DOCX</button>
+            </div>
+            <p id="notes-status" class="status-text"></p>
+          </div>
+          <div id="notes-output" class="panel notes-output notes-panel-output hidden">
+            <div class="notes-output-head">
+              <h4>Generated notes</h4>
+              <span id="notes-tts-mount"></span>
+            </div>
+            <pre id="notes-markdown" class="notes-markdown"></pre>
+          </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="page-knowledge-map" class="page">
+        <div class="page-inner km-page">
+          <header class="km-hero">
+            <div class="km-hero-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="6" cy="6" r="2.5"/>
+                <circle cx="18" cy="6" r="2.5"/>
+                <circle cx="12" cy="18" r="2.5"/>
+                <path d="M8 7.5l3 3M16 7.5l-3 3M12 11v4"/>
+              </svg>
+            </div>
+            <div class="km-hero-copy">
+              <h2 class="km-hero-title">Knowledge Map</h2>
+              <p class="km-hero-sub">Interactive hierarchy and topic graph built from your indexed documents — explore structure, relationships, and retrieval paths.</p>
+            </div>
+          </header>
+
+          <div class="km-main-toolbar ref-km-toolbar" role="region" aria-label="Map search">
+            <label class="km-toolbar-search">
+              <i data-lucide="search" width="16" height="16"></i>
+              <input type="search" id="km-toolbar-search" placeholder="Search nodes…" autocomplete="off" />
+            </label>
+            <select id="km-toolbar-filter" class="km-toolbar-filter" aria-label="Quick filter" disabled>
+              <option value="">Filter</option>
+              <option value="all">All nodes</option>
+              <option value="topic">Topics only</option>
+            </select>
+          </div>
+
+          <div class="km-shell">
+            <aside class="km-sidebar" aria-label="Graph controls">
+              <div class="km-glass-card km-controls-card">
+                <h3 class="km-card-heading">Graph</h3>
+                <label class="field-label" for="km-source">Document</label>
+                <select id="km-source" class="select-bar km-select">
+                  <option value="">All indexed documents</option>
+                </select>
+                <button type="button" class="btn btn-primary btn-block km-load-btn" id="btn-km-load">Generate map</button>
+                <p id="km-status" class="km-status" role="status"></p>
+                <label class="km-check">
+                  <input type="checkbox" id="km-physics" checked disabled />
+                  <span>Physics simulation</span>
+                </label>
+                <label class="field-label" for="km-layout">Layout</label>
+                <select id="km-layout" class="select-bar km-select" disabled>
+                  <option value="hierarchical">Hierarchical tree</option>
+                  <option value="force">Force-directed</option>
+                </select>
+              </div>
+
+              <div class="km-glass-card km-filters-card">
+                <h3 class="km-card-heading">Filters</h3>
+                <label class="field-label" for="km-filter-search">Search nodes</label>
+                <input type="search" id="km-filter-search" class="select-bar km-input" placeholder="Title or summary…" autocomplete="off" disabled />
+                <p class="km-filter-label">Node types</p>
+                <div class="km-kind-filters" id="km-kind-filters">
+                  <label class="km-check"><input type="checkbox" value="document" checked disabled /> Document</label>
+                  <label class="km-check"><input type="checkbox" value="chapter" checked disabled /> Chapter</label>
+                  <label class="km-check"><input type="checkbox" value="section" checked disabled /> Section</label>
+                  <label class="km-check"><input type="checkbox" value="page" checked disabled /> Page</label>
+                  <label class="km-check"><input type="checkbox" value="node" checked disabled /> Topic</label>
+                </div>
+                <label class="km-check km-check-spaced">
+                  <input type="checkbox" id="km-show-parent" checked disabled />
+                  <span>Hierarchy edges</span>
+                </label>
+                <label class="km-check">
+                  <input type="checkbox" id="km-show-related" checked disabled />
+                  <span>Related topic edges</span>
+                </label>
+                <label class="km-check km-focus-toggle">
+                  <input type="checkbox" id="km-focus-mode" disabled />
+                  <span>Focus mode</span>
+                </label>
+              </div>
+
+              <div class="km-glass-card km-stats-card">
+                <h3 class="km-card-heading">Statistics</h3>
+                <dl class="km-stat-grid" id="km-stat-grid">
+                  <div><dt>Nodes</dt><dd id="km-stat-nodes">—</dd></div>
+                  <div><dt>Edges</dt><dd id="km-stat-edges">—</dd></div>
+                  <div><dt>Parent links</dt><dd id="km-stat-parent">—</dd></div>
+                  <div><dt>Related</dt><dd id="km-stat-related">—</dd></div>
+                </dl>
+                <p id="km-stats-note" class="km-stats-note muted"></p>
+              </div>
+
+              <div class="km-glass-card km-legend-card">
+                <h3 class="km-card-heading">Legend</h3>
+                <ul class="km-legend-list">
+                  <li><span class="km-legend-swatch km-kind-document"></span> Document</li>
+                  <li><span class="km-legend-swatch km-kind-chapter"></span> Chapter</li>
+                  <li><span class="km-legend-swatch km-kind-section"></span> Section</li>
+                  <li><span class="km-legend-swatch km-kind-page"></span> Page</li>
+                  <li><span class="km-legend-swatch km-kind-node"></span> Topic</li>
+                </ul>
+                <p class="km-legend-edges muted">Solid = hierarchy · Dashed = related</p>
+              </div>
+            </aside>
+
+            <div class="km-canvas-strip" role="main" aria-label="Knowledge graph">
+              <div class="km-canvas-wrap" id="km-canvas-wrap">
+                <div class="km-canvas-toolbar">
+                  <div class="km-toolbar-group">
+                    <button type="button" class="btn btn-ghost btn-sm km-tool-btn" id="km-zoom-in" title="Zoom in" disabled>+</button>
+                    <button type="button" class="btn btn-ghost btn-sm km-tool-btn" id="km-zoom-out" title="Zoom out" disabled>−</button>
+                    <button type="button" class="btn btn-ghost btn-sm km-tool-btn" id="km-fit" title="Fit view" disabled>Fit</button>
+                  </div>
+                  <div class="km-toolbar-group">
+                    <button type="button" class="btn btn-ghost btn-sm km-tool-btn" id="km-toggle-minimap" title="Minimap" disabled>Map</button>
+                    <button type="button" class="btn btn-ghost btn-sm km-tool-btn" id="km-fullscreen" title="Fullscreen" disabled>⛶</button>
+                  </div>
+                  <span id="km-canvas-hint" class="km-canvas-hint muted">Click a node for summary &amp; path</span>
+                </div>
+
+                <div id="km-graph" class="km-graph" role="img" aria-label="Knowledge graph visualization"></div>
+                <div id="km-minimap" class="km-minimap hidden" aria-hidden="true"></div>
+                <div id="km-graph-skeleton" class="km-graph-skeleton hidden" aria-busy="true">
+                  <div class="km-skel-node km-skel-a"></div>
+                  <div class="km-skel-node km-skel-b"></div>
+                  <div class="km-skel-node km-skel-c"></div>
+                  <div class="km-skel-edge"></div>
+                </div>
+
+                <div id="km-empty" class="km-empty-state">
+                  <p class="km-empty-title">Graph canvas ready</p>
+                  <p class="muted">Select a document and generate a map to explore your knowledge graph.</p>
+                </div>
+              </div>
+            </div>
+
+            <aside id="km-detail" class="km-detail-panel km-panel-enter km-meta-rail hidden" aria-live="polite">
+                  <button type="button" class="km-detail-close" id="km-detail-close" aria-label="Close panel">&times;</button>
+                  <span id="km-detail-kind" class="summary-kind-badge"></span>
+                  <div class="summary-detail-head km-detail-head">
+                    <h4 id="km-detail-title"></h4>
+                    <span id="km-tts-mount" class="summary-tts-mount"></span>
+                  </div>
+                  <p id="km-detail-summary" class="muted"></p>
+                  <p id="km-detail-source" class="km-detail-meta"></p>
+                  <p id="km-detail-related" class="km-detail-related muted"></p>
+                  <p id="km-detail-path" class="km-detail-path muted"></p>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <section id="page-timeline" class="page">
+        <div class="page-inner timeline-page">
+          <header class="tl-hero">
+            <div class="tl-hero-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="12" cy="12" r="9"/>
+                <path d="M12 7v5l3 2"/>
+              </svg>
+            </div>
+            <div class="tl-hero-copy">
+              <h2 class="tl-hero-title">Timeline</h2>
+              <p class="tl-hero-sub">Chronological events extracted from your indexed documents.</p>
+            </div>
+          </header>
+
+          <div class="tl-shell">
+            <aside class="tl-sidebar" aria-label="Timeline controls">
+              <div class="tl-glass-card tl-controls-card">
+                <h3 class="tl-card-heading">Extraction</h3>
+                <label class="field-label" for="tl-source">Document</label>
+                <select id="tl-source" class="select-bar tl-select">
+                  <option value="">All indexed documents</option>
+                </select>
+                <button type="button" class="btn btn-primary btn-block tl-extract-btn" id="btn-tl-load">
+                  Extract timeline
+                </button>
+                <p id="tl-status" class="tl-status" role="status"></p>
+                <p id="tl-explanation" class="tl-explanation muted"></p>
+              </div>
+
+              <div class="tl-glass-card tl-filters-card">
+                <h3 class="tl-card-heading">Filters</h3>
+                <label class="field-label" for="tl-filter-search">Search events</label>
+                <input type="search" id="tl-filter-search" class="select-bar tl-input" placeholder="Title, snippet, source…" autocomplete="off" disabled />
+                <label class="field-label" for="tl-filter-year">Year</label>
+                <select id="tl-filter-year" class="select-bar tl-select" disabled>
+                  <option value="">All years</option>
+                </select>
+                <label class="field-label" for="tl-filter-doc">Source document</label>
+                <select id="tl-filter-doc" class="select-bar tl-select" disabled>
+                  <option value="">All sources</option>
+                </select>
+                <div class="tl-filter-actions">
+                  <button type="button" class="btn btn-ghost btn-sm" id="tl-expand-all" disabled>Expand all</button>
+                  <button type="button" class="btn btn-ghost btn-sm" id="tl-collapse-all" disabled>Collapse all</button>
+                </div>
+              </div>
+
+              <div class="tl-glass-card tl-zoom-card">
+                <h3 class="tl-card-heading">View</h3>
+                <label class="field-label" for="tl-zoom">Timeline zoom</label>
+                <div class="tl-zoom-row">
+                  <button type="button" class="btn btn-ghost btn-sm tl-zoom-btn" id="tl-zoom-out" aria-label="Zoom out" disabled>−</button>
+                  <input type="range" id="tl-zoom" class="tl-zoom-slider" min="75" max="125" value="100" step="5" disabled />
+                  <button type="button" class="btn btn-ghost btn-sm tl-zoom-btn" id="tl-zoom-in" aria-label="Zoom in" disabled>+</button>
+                </div>
+                <span id="tl-zoom-label" class="tl-zoom-label">100%</span>
+              </div>
+            </aside>
+
+            <main class="tl-main" aria-label="Timeline visualization">
+              <div class="tl-viz-toolbar">
+                <label class="tl-filter-year-inline field-label muted" style="font-size:.75rem;margin:0">
+                  Filter by year
+                  <select id="tl-filter-year-toolbar" class="select-bar tl-select" disabled aria-label="Filter timeline by year" style="margin-top:.35rem;max-width:12rem;">
+                    <option value="">All years</option>
+                  </select>
+                </label>
+                <div class="tl-viz-status-row">
+                  <span id="tl-event-count" class="tl-event-count">No events loaded</span>
+                  <span class="tl-viz-hint muted">Click an event to open its page in Documents</span>
+                </div>
+              </div>
+              <div id="timeline-viz" class="tl-viz-scroll">
+                <div class="tl-empty-state">
+                  <p class="tl-empty-title">Ready to explore</p>
+                  <p class="muted">Choose a document and extract a timeline to see connected events here.</p>
+                </div>
+              </div>
+            </main>
+          </div>
+        </div>
+      </section>
+
+      <section id="page-notebook" class="page">
+        <div class="page-inner notebook-page-wrap">
+          <header class="notebook-page-header">
+            <h2>My Notes</h2>
+            <button type="button" class="btn btn-primary btn-sm" id="btn-notebook-new-chat">+ New chat</button>
+          </header>
+          <div class="notebook-tabs" role="tablist">
+            <button type="button" class="notebook-tab active" data-nb-filter="all">All</button>
+            <button type="button" class="notebook-tab" data-nb-filter="summaries">Summaries</button>
+            <button type="button" class="notebook-tab" data-nb-filter="topics">Topics</button>
+            <button type="button" class="notebook-tab" data-nb-filter="explanations">Explanations</button>
+            <button type="button" class="notebook-tab" data-nb-filter="custom">Custom</button>
+          </div>
+        <div class="panel notebook-composer-panel">
+          <h3>New note</h3>
+          <label class="field-label" for="notebook-source">Related document (optional)</label>
+          <select id="notebook-source" class="select-bar doc-source-select"><option value="">None</option></select>
+          <label class="field-label" for="note-format">Format</label>
+          <select id="note-format" class="select-bar">
+            <option value="plain">Plain text</option>
+            <option value="heading">Heading</option>
+            <option value="important">Important</option>
+            <option value="bullets">Bullet list</option>
+            <option value="underline">Underline</option>
+            <option value="index">Index / outline</option>
+          </select>
+          <input type="text" id="note-title" placeholder="Title" class="note-title-input" />
+          <textarea id="note-body" rows="6" placeholder="Write your note..."></textarea>
+          <button type="button" class="btn btn-primary" id="btn-save-note">Save to notebook</button>
+        </div>
+        <div id="notebook-list" class="notebook-list notebook-card-grid"></div>
+        <p id="notebook-empty" class="muted">No notes yet.</p>
+        </div>
+      </section>
+
+      <section id="page-compare" class="page">
+        <div class="page-inner compare-page">
+        <header class="compare-hero">
+          <h2 class="compare-hero-title">Compare documents</h2>
+          <p class="compare-hero-desc">Semantic diff with embeddings and AI summaries — PDF or TXT, upload or from your library.</p>
+        </header>
+        <div class="compare-upload-grid">
+            <article class="compare-card" data-slot="a">
+              <div class="compare-card-head">
+                <span class="compare-letter">A</span>
+                <span class="compare-card-label">Document A</span>
+              </div>
+              <div class="compare-segments" role="tablist">
+                <button type="button" class="compare-segment active" data-slot="a" data-mode="upload">Upload</button>
+                <button type="button" class="compare-segment" data-slot="a" data-mode="library">Library</button>
+              </div>
+              <div class="compare-pane-upload" data-slot="a">
+                <label class="compare-drop" for="compare-file-a">
+                  <input type="file" id="compare-file-a" class="compare-file-input" accept=".pdf,.txt" />
+                  <span class="compare-drop-title">Drop file or click to browse</span>
+                  <span id="compare-name-a" class="compare-drop-file muted">No file selected</span>
+                </label>
+              </div>
+              <div class="compare-pane-library hidden" data-slot="a">
+                <label class="field-label" for="compare-source-a">Indexed document</label>
+                <select id="compare-source-a" class="select-bar"><option value="">Select a document…</option></select>
+              </div>
+            </article>
+            <article class="compare-card" data-slot="b">
+              <div class="compare-card-head">
+                <span class="compare-letter">B</span>
+                <span class="compare-card-label">Document B</span>
+              </div>
+              <div class="compare-segments" role="tablist">
+                <button type="button" class="compare-segment active" data-slot="b" data-mode="upload">Upload</button>
+                <button type="button" class="compare-segment" data-slot="b" data-mode="library">Library</button>
+              </div>
+              <div class="compare-pane-upload" data-slot="b">
+                <label class="compare-drop" for="compare-file-b">
+                  <input type="file" id="compare-file-b" class="compare-file-input" accept=".pdf,.txt" />
+                  <span class="compare-drop-title">Drop file or click to browse</span>
+                  <span id="compare-name-b" class="compare-drop-file muted">No file selected</span>
+                </label>
+              </div>
+              <div class="compare-pane-library hidden" data-slot="b">
+                <label class="field-label" for="compare-source-b">Indexed document</label>
+                <select id="compare-source-b" class="select-bar"><option value="">Select a document…</option></select>
+              </div>
+            </article>
+          </div>
+          <div class="compare-sticky-toolbar">
+            <button type="button" class="btn btn-primary btn-sm" id="btn-compare-run">Run comparison</button>
+            <p id="compare-status" class="compare-status hidden" role="status"></p>
+            <div id="compare-global-sim" class="compare-sim-global hidden" aria-live="polite"></div>
+          </div>
+        <div id="compare-results" class="compare-results hidden">
+          <div class="compare-summary-grid">
+            <section class="compare-summary-card">
+              <h3 class="compare-section-title">Key similarities</h3>
+              <ul id="compare-similarities" class="compare-bullet-list"></ul>
+            </section>
+            <section class="compare-summary-card">
+              <h3 class="compare-section-title">Key differences</h3>
+              <ul id="compare-differences" class="compare-bullet-list"></ul>
+            </section>
+          </div>
+          <section class="compare-insights">
+            <div class="compare-insight">
+              <h4 class="compare-insight-title" id="compare-missing-b-title">Missing in B</h4>
+              <ul id="compare-missing-b" class="compare-bullet-list"></ul>
+            </div>
+            <div class="compare-insight">
+              <h4 class="compare-insight-title" id="compare-missing-a-title">Missing in A</h4>
+              <ul id="compare-missing-a" class="compare-bullet-list"></ul>
+            </div>
+            <div class="compare-insight">
+              <h4 class="compare-insight-title">Changed sections</h4>
+              <ul id="compare-changed" class="compare-bullet-list"></ul>
+            </div>
+          </section>
+          <div class="compare-results-toolbar">
+            <h3 class="compare-section-title">Side-by-side</h3>
+            <span id="compare-tts-mount" class="summary-tts-mount"></span>
+            <button type="button" class="btn btn-ghost btn-sm" id="btn-compare-download">Download report</button>
+          </div>
+          <div id="compare-rows" class="compare-rows"></div>
+        </div>
+        </div>
+      </section>
+
+      <section id="page-tools" class="page">
+        <div class="page-inner tools-page-wrap">
+          <header class="tools-page-hero">
+            <h2 class="tools-hero-title">Tools</h2>
+            <p class="tools-hero-sub muted">Powerful utilities to work with your documents.</p>
+          </header>
+          <div id="tools-cards" class="tools-card-grid" aria-label="Tool shortcuts"></div>
+        <div class="panel tools-advanced-panel">
+          <h3 class="tools-advanced-heading">Configure & run</h3>
+          <label class="field-label" for="tool-source">Document</label>
+          <select id="tool-source" class="select-bar"><option value="">All documents</option></select>
+          <label class="field-label" for="tool-action">Action</label>
+          <select id="tool-action" class="select-bar"></select>
+          <label class="custom-tool-label hidden" id="custom-tool-wrap">
+            Custom instruction
+            <textarea id="tool-custom" rows="3"></textarea>
+          </label>
+          <button type="button" class="btn btn-primary btn-block" id="btn-run-tool">Run</button>
+          <div id="tool-result" class="tool-result hidden"></div>
+        </div>
+        <div class="panel tool-history-panel">
+          <h3>Recent tool runs</h3>
+          <div id="tool-history-list" class="history-list"></div>
+          <p id="tool-history-empty" class="muted">No tool runs yet.</p>
+        </div>
+        </div>
+      </section>
+        </div>
+        <aside class="quick-rail ref-right-rail" aria-label="Dashboard">
+          <p class="quick-rail-title ref-rail-heading">Overview</p>
+          <div class="dash-stat-grid">
+            <article class="dash-stat-card">
+              <span class="dash-stat-icon dash-stat-icon-docs"><i data-lucide="files"></i></span>
+              <div>
+                <p class="dash-stat-value" id="dash-stat-docs">0</p>
+                <p class="dash-stat-label">Documents</p>
+                <span class="dash-stat-delta" id="dash-stat-docs-delta">Indexed in workspace</span>
+              </div>
+            </article>
+            <article class="dash-stat-card">
+              <span class="dash-stat-icon dash-stat-icon-pages"><i data-lucide="file-text"></i></span>
+              <div>
+                <p class="dash-stat-value" id="dash-stat-pages">—</p>
+                <p class="dash-stat-label">Total pages</p>
+                <span class="dash-stat-delta" id="dash-stat-pages-delta">Est. segments</span>
+              </div>
+            </article>
+            <article class="dash-stat-card">
+              <span class="dash-stat-icon dash-stat-icon-chats"><i data-lucide="inbox"></i></span>
+              <div>
+                <p class="dash-stat-value" id="dash-stat-chats">0</p>
+                <p class="dash-stat-label">Chats</p>
+                <span class="dash-stat-delta" id="dash-stat-chats-delta">+0 this week</span>
+              </div>
+            </article>
+            <article class="dash-stat-card">
+              <span class="dash-stat-icon dash-stat-icon-disk"><i data-lucide="hard-drive"></i></span>
+              <div>
+                <p class="dash-stat-value" id="dash-stat-disk">—</p>
+                <p class="dash-stat-label">Storage load</p>
+                <span class="dash-stat-delta" id="dash-stat-disk-delta">Library profile</span>
+              </div>
+            </article>
+          </div>
+          <div class="rail-activity-block">
+            <p class="quick-rail-title ref-rail-heading">Activity</p>
+            <div id="rail-activity-inner" class="rail-activity-inner rail-chip-col" aria-live="polite"></div>
+            <p id="rail-activity-empty" class="muted" style="font-size:0.75rem;margin:0">Nothing recent yet.</p>
+          </div>
+          <p class="quick-rail-title ref-rail-heading">Quick tools</p>
+          <div class="dash-tool-stack">
+          <button type="button" class="dash-gradient-card dash-g-purple" data-quick-nav="compare">
+            <span class="dash-g-icon"><i data-lucide="git-compare"></i></span>
+            <span class="dash-g-text"><strong>Compare documents</strong><small>Semantic diff & summaries</small></span>
+            <i data-lucide="arrow-right" class="dash-g-arrow"></i>
+          </button>
+          <button type="button" class="dash-gradient-card dash-g-blue" data-quick-nav="knowledge-map">
+            <span class="dash-g-icon"><i data-lucide="network"></i></span>
+            <span class="dash-g-text"><strong>Knowledge map</strong><small>Interactive topic graph</small></span>
+            <i data-lucide="arrow-right" class="dash-g-arrow"></i>
+          </button>
+          <button type="button" class="dash-gradient-card dash-g-rose" data-quick-nav="timeline">
+            <span class="dash-g-icon"><i data-lucide="calendar-days"></i></span>
+            <span class="dash-g-text"><strong>Timeline</strong><small>Extract dated events</small></span>
+            <i data-lucide="arrow-right" class="dash-g-arrow"></i>
+          </button>
+          <button type="button" class="dash-gradient-card dash-g-teal" data-quick-nav="notes">
+            <span class="dash-g-icon"><i data-lucide="sparkles"></i></span>
+            <span class="dash-g-text"><strong>AI notes</strong><small>Structured study outputs</small></span>
+            <i data-lucide="arrow-right" class="dash-g-arrow"></i>
+          </button>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </div>
+  <div id="sidebar-backdrop" class="sidebar-backdrop hidden" aria-hidden="true"></div>
+
+  <div id="history-modal" class="history-modal hidden" role="dialog" aria-modal="true" aria-labelledby="history-title">
+    <div class="history-backdrop" id="history-backdrop"></div>
+    <div class="history-panel">
+      <header class="history-header">
+        <h2 id="history-title">History</h2>
+        <button type="button" class="history-close" id="history-close" aria-label="Close">&times;</button>
+      </header>
+      <nav class="history-tabs" id="history-tabs">
+        <button type="button" class="history-tab active" data-history-tab="chat">Chat</button>
+        <button type="button" class="history-tab" data-history-tab="notebook">Notebook</button>
+        <button type="button" class="history-tab" data-history-tab="tools">Tools</button>
+        <button type="button" class="history-tab" data-history-tab="documents">Documents</button>
+        <button type="button" class="history-tab" data-history-tab="compare">Compare</button>
+        <button type="button" class="history-tab" data-history-tab="notes">Notes</button>
+        <button type="button" class="history-tab" data-history-tab="map">Map</button>
+        <button type="button" class="history-tab" data-history-tab="timeline">Timeline</button>
+      </nav>
+      <div class="history-body" id="history-body"></div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+  <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+  <script src="https://unpkg.com/vis-network@9.1.9/standalone/umd/vis-network.min.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/tts.js"></script>
+  <script src="/js/stt.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>

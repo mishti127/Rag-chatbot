@@ -1,0 +1,959 @@
+/**
+ * Reference mock UI — dark slate + deep purple, cyan / magenta / green accents.
+ * Loads after layout-system.css. Targets #app-shell.app-shell-premium.
+ */
+
+#app-shell.app-shell-premium {
+  --ds-bg-deep: #06060d;
+  --ds-surface-0: #0e0e16;
+  --ds-surface-1: #14141f;
+  --ds-surface-2: #1a1a28;
+  --ds-border: rgba(255, 255, 255, 0.08);
+  --ds-border-strong: rgba(255, 255, 255, 0.14);
+  --ds-purple: #6d28d9;
+  --ds-purple-glow: rgba(109, 40, 217, 0.35);
+  --ds-cyan: #22d3ee;
+  --ds-cyan-dim: rgba(34, 211, 238, 0.16);
+  --ds-magenta: #e879f9;
+  --ds-magenta-dim: rgba(232, 121, 249, 0.14);
+  --ds-green: #4ade80;
+  --ds-green-dim: rgba(74, 222, 128, 0.14);
+  --ds-text: #f1f5f9;
+  --ds-muted: #94a3b8;
+  --ds-radius-lg: 20px;
+  --ds-radius-md: 14px;
+  --ds-radius-sm: 10px;
+  --ds-shadow-card: 0 4px 24px rgba(0, 0, 0, 0.45);
+  --font-display: "Outfit", "Plus Jakarta Sans", Inter, system-ui, sans-serif;
+}
+
+#app-shell.app-shell-premium .workspace {
+  background: linear-gradient(165deg, var(--ds-surface-0) 0%, var(--ds-bg-deep) 50%, #0a0818 100%) !important;
+}
+
+/* —— Sidebar —— */
+#app-shell.app-shell-premium .sidebar {
+  background: linear-gradient(180deg, var(--ds-surface-1) 0%, var(--ds-surface-0) 100%) !important;
+  border: 1px solid var(--ds-border-strong) !important;
+  box-shadow: var(--ds-shadow-card), 0 0 60px var(--ds-purple-glow) !important;
+}
+
+#app-shell.app-shell-premium .sidebar-brand-text strong {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  font-size: 1.05rem;
+}
+
+#app-shell.app-shell-premium .nav-item {
+  border-radius: var(--ds-radius-sm);
+  border: 1px solid transparent;
+  transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+}
+
+#app-shell.app-shell-premium .nav-item:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: var(--ds-border);
+}
+
+#app-shell.app-shell-premium .nav-item.active {
+  background: linear-gradient(135deg, var(--ds-cyan-dim), rgba(34, 211, 238, 0.06)) !important;
+  border-color: rgba(34, 211, 238, 0.35) !important;
+  color: var(--ds-text) !important;
+}
+
+#app-shell.app-shell-premium .nav-item.active .nav-icon-wrap {
+  color: var(--ds-cyan) !important;
+}
+
+#app-shell.app-shell-premium .sidebar-label {
+  font-size: 0.65rem !important;
+  text-transform: uppercase;
+  letter-spacing: 0.12em !important;
+  color: var(--ds-muted) !important;
+}
+
+#app-shell.app-shell-premium .thread-item-title {
+  color: var(--ds-text);
+}
+
+.sidebar-view-all-chats {
+  margin: 0.35rem 0 0;
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  font-size: 0.72rem;
+  color: var(--ds-cyan);
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+}
+.sidebar-view-all-chats:hover {
+  text-decoration: underline;
+}
+
+/* —— Header —— */
+#app-shell.app-shell-premium .header {
+  background: rgba(14, 14, 22, 0.85);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--ds-border);
+}
+
+#app-shell.app-shell-premium .header-search-faux,
+#app-shell.app-shell-premium .header-search-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.55rem 1rem;
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-surface-2);
+  border: 1px solid var(--ds-border-strong);
+  color: var(--ds-muted);
+  font-size: 0.82rem;
+  min-width: min(420px, 36vw);
+  cursor: text;
+}
+
+#app-shell.app-shell-premium .header-search-wrap input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  color: var(--ds-text);
+  font: inherit;
+  outline: none;
+}
+
+#app-shell.app-shell-premium .header-search-faux kbd,
+#app-shell.app-shell-premium .header-search-wrap kbd {
+  font-size: 0.65rem;
+  padding: 0.2rem 0.4rem;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--ds-border);
+  color: var(--ds-muted);
+}
+
+#app-shell.app-shell-premium .header-icon-btn {
+  border-radius: var(--ds-radius-sm);
+  border: 1px solid var(--ds-border);
+  background: var(--ds-surface-2);
+  color: var(--ds-muted);
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+#app-shell.app-shell-premium .header-icon-btn:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(34, 211, 238, 0.25);
+  color: var(--ds-cyan);
+}
+
+#app-shell.app-shell-premium #page-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+/* Profile dropdown — must sit above workspace content; not clipped by header */
+#app-shell.app-shell-premium .header {
+  overflow: visible !important;
+  z-index: 120;
+}
+
+#app-shell.app-shell-premium .workspace {
+  overflow: visible;
+}
+
+#app-shell.app-shell-premium .header-profile {
+  flex-shrink: 0;
+}
+
+#app-shell.app-shell-premium .profile-menu {
+  background: var(--ds-surface-1);
+  border-color: var(--ds-border-strong);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.55);
+  z-index: 250;
+}
+
+#app-shell.app-shell-premium .profile-menu-actions {
+  border-top-color: var(--ds-border);
+}
+
+#app-shell.app-shell-premium .profile-menu .menu-item:hover {
+  background: rgba(34, 211, 238, 0.1);
+}
+
+#app-shell.app-shell-premium .profile-menu .menu-danger:hover {
+  background: rgba(248, 113, 113, 0.12);
+}
+
+/* Hide center doc stat chips — metrics live in right rail per reference */
+#app-shell.app-shell-premium #page-documents .doc-stats-row {
+  display: none !important;
+}
+
+/* —— Documents: card grid —— */
+#app-shell.app-shell-premium #page-documents .doc-list.ref-doc-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+  gap: 1rem !important;
+  list-style: none !important;
+  padding: 0 !important;
+}
+
+#app-shell.app-shell-premium #page-documents .doc-list-item {
+  flex-direction: column !important;
+  align-items: stretch !important;
+  padding: 1rem 1.1rem !important;
+  border-radius: var(--ds-radius-md) !important;
+  border: 1px solid var(--ds-border-strong) !important;
+  background: linear-gradient(145deg, var(--ds-surface-2), var(--ds-surface-1)) !important;
+  box-shadow: var(--ds-shadow-card);
+  gap: 0.75rem !important;
+  border-bottom: none !important;
+}
+
+#app-shell.app-shell-premium .doc-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+#app-shell.app-shell-premium .doc-status-pill {
+  font-size: 0.62rem !important;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0.2rem 0.55rem !important;
+  border-radius: 999px !important;
+  background: var(--ds-green-dim) !important;
+  color: var(--ds-green) !important;
+  border: 1px solid rgba(74, 222, 128, 0.25) !important;
+}
+
+#app-shell.app-shell-premium .doc-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.75rem;
+  font-size: 0.75rem !important;
+}
+
+#app-shell.app-shell-premium .doc-list-actions {
+  margin-top: auto;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--ds-border);
+  justify-content: flex-end !important;
+}
+
+#app-shell.app-shell-premium .doc-icon-btn {
+  border-radius: var(--ds-radius-sm) !important;
+  border: 1px solid var(--ds-border) !important;
+  background: rgba(255, 255, 255, 0.03) !important;
+  color: var(--ds-muted) !important;
+}
+
+#app-shell.app-shell-premium .doc-icon-btn:hover {
+  color: var(--ds-cyan) !important;
+  border-color: rgba(34, 211, 238, 0.3) !important;
+}
+
+/* Upload zone */
+#app-shell.app-shell-premium .ref-upload-panel {
+  border-radius: var(--ds-radius-lg) !important;
+  border: 1px solid var(--ds-border-strong) !important;
+  background: var(--ds-surface-1) !important;
+}
+
+#app-shell.app-shell-premium .upload-zone.ref-upload-zone {
+  border: 2px dashed rgba(34, 211, 238, 0.22) !important;
+  border-radius: var(--ds-radius-md) !important;
+  background: rgba(34, 211, 238, 0.04) !important;
+}
+
+#app-shell.app-shell-premium .upload-zone-hint {
+  font-size: 0.78rem;
+  color: var(--ds-muted);
+  margin: 0.5rem 0 0;
+}
+
+#app-shell.app-shell-premium .btn-browse-files {
+  margin-top: 1rem;
+  border-radius: var(--ds-radius-sm) !important;
+}
+
+/* Activity strip — horizontal cards */
+#app-shell.app-shell-premium .doc-activity-strip {
+  display: flex;
+  gap: 0.85rem;
+  overflow-x: auto;
+  padding-bottom: 0.35rem;
+  scroll-snap-type: x proximity;
+}
+
+#app-shell.app-shell-premium .doc-activity-strip::-webkit-scrollbar {
+  height: 6px;
+}
+#app-shell.app-shell-premium .doc-activity-strip::-webkit-scrollbar-thumb {
+  background: var(--ds-border-strong);
+  border-radius: 99px;
+}
+
+#app-shell.app-shell-premium .activity-chip {
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+  min-width: 200px;
+  padding: 0.85rem 1rem !important;
+  border-radius: var(--ds-radius-md) !important;
+  border: 1px solid var(--ds-border-strong) !important;
+  background: var(--ds-surface-2) !important;
+  font-size: 0.78rem !important;
+}
+
+#app-shell.app-shell-premium .activity-chip.doc {
+  border-left: 3px solid var(--ds-cyan);
+}
+#app-shell.app-shell-premium .activity-chip.chat {
+  border-left: 3px solid var(--ds-magenta);
+}
+#app-shell.app-shell-premium .activity-chip.tool {
+  border-left: 3px solid var(--ds-green);
+}
+
+/* —— Right rail overview —— */
+#app-shell.app-shell-premium .dash-stat-card {
+  border-radius: var(--ds-radius-md) !important;
+  border: 1px solid var(--ds-border-strong) !important;
+  background: var(--ds-surface-2) !important;
+}
+
+#app-shell.app-shell-premium .dash-stat-delta {
+  display: block;
+  font-size: 0.68rem;
+  color: var(--ds-green);
+  margin-top: 0.2rem;
+  font-weight: 500;
+}
+
+#app-shell.app-shell-premium .dash-gradient-card {
+  border-radius: var(--ds-radius-md) !important;
+  border: 1px solid var(--ds-border) !important;
+}
+
+/* Narrow rail: single-column stats, compact type, wrapped quick-tool copy */
+#app-shell.app-shell-premium .quick-rail.ref-right-rail {
+  padding: var(--space-3) var(--space-3) var(--space-4) !important;
+  gap: var(--space-3) !important;
+}
+
+#app-shell.app-shell-premium .dash-stat-grid {
+  grid-template-columns: 1fr !important;
+  gap: 0.45rem !important;
+}
+
+#app-shell.app-shell-premium .dash-stat-card {
+  align-items: flex-start !important;
+  gap: 0.5rem !important;
+  padding: 0.48rem 0.52rem !important;
+}
+
+#app-shell.app-shell-premium .dash-stat-icon {
+  flex-shrink: 0;
+}
+
+#app-shell.app-shell-premium .dash-stat-icon svg {
+  width: 1.1rem !important;
+  height: 1.1rem !important;
+}
+
+#app-shell.app-shell-premium .dash-stat-value {
+  font-size: 1.05rem !important;
+  line-height: 1.2 !important;
+  margin: 0 !important;
+}
+
+#app-shell.app-shell-premium .dash-stat-label {
+  margin: 0 !important;
+  font-size: 0.61rem !important;
+  line-height: 1.25 !important;
+  letter-spacing: 0.04em;
+}
+
+#app-shell.app-shell-premium .dash-stat-delta {
+  font-size: 0.6rem !important;
+  line-height: 1.3 !important;
+  margin-top: 0.15rem !important;
+  word-break: break-word;
+  color: var(--ds-muted);
+  font-weight: 500;
+}
+
+#app-shell.app-shell-premium .dash-tool-stack > .dash-gradient-card {
+  padding: 0.52rem 0.55rem !important;
+  gap: 0.45rem !important;
+  align-items: flex-start !important;
+}
+
+#app-shell.app-shell-premium .dash-gradient-card .dash-g-text {
+  min-width: 0;
+}
+
+#app-shell.app-shell-premium .dash-gradient-card .dash-g-text strong {
+  font-size: 0.73rem !important;
+  font-weight: 600;
+  display: block;
+  line-height: 1.3;
+  word-break: break-word;
+}
+
+#app-shell.app-shell-premium .dash-gradient-card .dash-g-text small {
+  font-size: 0.62rem !important;
+  display: block;
+  line-height: 1.35;
+  margin-top: 0.12rem;
+  word-break: break-word;
+}
+
+#app-shell.app-shell-premium .dash-g-icon svg {
+  width: 1.15rem !important;
+  height: 1.15rem !important;
+}
+
+#app-shell.app-shell-premium .dash-g-arrow {
+  flex-shrink: 0;
+  align-self: center;
+}
+
+#app-shell.app-shell-premium .rail-activity-block .quick-rail-title {
+  margin-bottom: var(--space-2) !important;
+}
+
+/* —— Chat —— */
+#app-shell.app-shell-premium #page-chat .msg-assistant .msg-bubble {
+  border-radius: var(--ds-radius-md) !important;
+  border: 1px solid var(--ds-border-strong) !important;
+  background: var(--ds-surface-2) !important;
+  max-width: min(100%, 48rem);
+}
+
+#app-shell.app-shell-premium .msg-thread-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.65rem 1rem;
+  margin-bottom: 1rem;
+  border-radius: var(--ds-radius-md);
+  border: 1px solid var(--ds-border-strong);
+  background: var(--ds-surface-1);
+  max-width: min(100%, 48rem);
+}
+
+#app-shell.app-shell-premium .msg-thread-topbar .msg-thread-title {
+  font-weight: 600;
+  font-size: 0.92rem;
+  margin: 0;
+}
+
+#app-shell.app-shell-premium .msg-thread-topbar .msg-thread-meta {
+  font-size: 0.75rem;
+  color: var(--ds-muted);
+}
+
+#app-shell.app-shell-premium .msg-thread-actions {
+  display: flex;
+  gap: 0.35rem;
+}
+
+#app-shell.app-shell-premium .msg-thread-actions button {
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--ds-radius-sm);
+  border: 1px solid var(--ds-border);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--ds-muted);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+#app-shell.app-shell-premium .msg-thread-actions button:hover {
+  color: var(--ds-cyan);
+  border-color: rgba(34, 211, 238, 0.3);
+}
+
+#app-shell.app-shell-premium .msg-body-structured p {
+  margin: 0 0 0.75rem;
+  line-height: 1.55;
+}
+
+#app-shell.app-shell-premium .msg-body-structured ul {
+  margin: 0 0 0.75rem;
+  padding-left: 1.2rem;
+}
+
+#app-shell.app-shell-premium .msg-sources-block {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--ds-border);
+}
+
+#app-shell.app-shell-premium .msg-sources-block h4 {
+  margin: 0 0 0.5rem;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ds-muted);
+}
+
+#app-shell.app-shell-premium .msg-source-link {
+  display: block;
+  font-size: 0.82rem;
+  color: var(--ds-cyan);
+  text-decoration: none;
+  margin-bottom: 0.35rem;
+}
+
+#app-shell.app-shell-premium .msg-source-link:hover {
+  opacity: 0.88;
+  text-decoration: underline;
+}
+#app-shell.app-shell-premium .doc-more {
+  position: relative;
+}
+
+#app-shell.app-shell-premium .doc-more-summary {
+  list-style: none;
+  cursor: pointer;
+}
+
+#app-shell.app-shell-premium .doc-more-summary::-webkit-details-marker {
+  display: none;
+}
+
+#app-shell.app-shell-premium .doc-more-menu {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 6px);
+  min-width: 180px;
+  padding: 0.35rem;
+  border-radius: var(--ds-radius-sm);
+  border: 1px solid var(--ds-border-strong);
+  background: var(--ds-surface-1);
+  box-shadow: var(--ds-shadow-card);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+#app-shell.app-shell-premium .doc-more-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.45rem 0.6rem;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ds-text);
+  font: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+#app-shell.app-shell-premium .doc-more-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+#app-shell.app-shell-premium .doc-more-danger {
+  color: #fb7185;
+}
+
+#app-shell.app-shell-premium .msg-assistant-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+#app-shell.app-shell-premium .msg-action-btn {
+  padding: 0.45rem 0.85rem;
+  border-radius: var(--ds-radius-sm);
+  border: 1px solid var(--ds-border);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--ds-text);
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+#app-shell.app-shell-premium .msg-action-btn:hover {
+  border-color: rgba(232, 121, 249, 0.35);
+  background: var(--ds-magenta-dim);
+}
+
+#app-shell.app-shell-premium #page-chat .composer textarea {
+  border-radius: var(--ds-radius-md) !important;
+}
+
+#app-shell.app-shell-premium .composer-footnote {
+  text-align: center;
+  font-size: 0.72rem;
+  color: var(--ds-muted);
+  margin: 0.5rem 0 0;
+  max-width: var(--layout-chat-max, 42rem);
+  width: 100%;
+}
+
+/* —— Notebook —— */
+#app-shell.app-shell-premium .notebook-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+#app-shell.app-shell-premium .notebook-page-header h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
+#app-shell.app-shell-premium .notebook-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+#app-shell.app-shell-premium .notebook-tab {
+  border-radius: 999px !important;
+  border: 1px solid var(--ds-border) !important;
+  background: transparent !important;
+  color: var(--ds-muted) !important;
+  padding: 0.45rem 1rem !important;
+  font-size: 0.8rem !important;
+}
+
+#app-shell.app-shell-premium .notebook-tab.active {
+  background: var(--ds-cyan-dim) !important;
+  border-color: rgba(34, 211, 238, 0.35) !important;
+  color: var(--ds-text) !important;
+}
+
+#app-shell.app-shell-premium .notebook-entry.nb-card {
+  border-radius: var(--ds-radius-md) !important;
+  border: 1px solid var(--ds-border-strong) !important;
+  padding: 1.1rem !important;
+  position: relative;
+  overflow: hidden;
+}
+
+#app-shell.app-shell-premium .notebook-entry.nb-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: var(--nb-accent, var(--ds-purple));
+}
+
+#app-shell.app-shell-premium .nb-card.nb-accent-purple {
+  --nb-accent: #a855f7;
+  background: linear-gradient(145deg, rgba(168, 85, 247, 0.12), var(--ds-surface-2)) !important;
+}
+#app-shell.app-shell-premium .nb-card.nb-accent-blue {
+  --nb-accent: #3b82f6;
+  background: linear-gradient(145deg, rgba(59, 130, 246, 0.14), var(--ds-surface-2)) !important;
+}
+#app-shell.app-shell-premium .nb-card.nb-accent-orange {
+  --nb-accent: #fb923c;
+  background: linear-gradient(145deg, rgba(251, 146, 60, 0.14), var(--ds-surface-2)) !important;
+}
+#app-shell.app-shell-premium .nb-card.nb-accent-sky {
+  --nb-accent: #38bdf8;
+  background: linear-gradient(145deg, rgba(56, 189, 248, 0.14), var(--ds-surface-2)) !important;
+}
+#app-shell.app-shell-premium .nb-card.nb-accent-rose {
+  --nb-accent: #fb7185;
+  background: linear-gradient(145deg, rgba(251, 113, 133, 0.14), var(--ds-surface-2)) !important;
+}
+#app-shell.app-shell-premium .nb-card.nb-accent-indigo {
+  --nb-accent: #6366f1;
+  background: linear-gradient(145deg, rgba(99, 102, 241, 0.14), var(--ds-surface-2)) !important;
+}
+#app-shell.app-shell-premium .nb-card.nb-accent-green {
+  --nb-accent: #4ade80;
+  background: linear-gradient(145deg, rgba(74, 222, 128, 0.12), var(--ds-surface-2)) !important;
+}
+#app-shell.app-shell-premium .nb-card.nb-accent-teal {
+  --nb-accent: #2dd4bf;
+  background: linear-gradient(145deg, rgba(45, 212, 191, 0.12), var(--ds-surface-2)) !important;
+}
+
+#app-shell.app-shell-premium .nb-card-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  margin-bottom: 0.5rem;
+}
+
+#app-shell.app-shell-premium .nb-card-ico {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--ds-text);
+}
+
+#app-shell.app-shell-premium .nb-card-meta {
+  font-size: 0.72rem;
+  color: var(--ds-muted);
+  margin-top: 0.5rem;
+}
+
+/* —— Knowledge map toolbar —— */
+#app-shell.app-shell-premium .km-main-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 1rem;
+  margin-bottom: 1rem;
+  border-radius: var(--ds-radius-md);
+  border: 1px solid var(--ds-border-strong);
+  background: var(--ds-surface-1);
+}
+
+#app-shell.app-shell-premium .km-toolbar-search {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+  min-width: 200px;
+  max-width: 420px;
+  padding: 0.45rem 0.75rem;
+  border-radius: var(--ds-radius-sm);
+  border: 1px solid var(--ds-border);
+  background: var(--ds-surface-2);
+}
+
+#app-shell.app-shell-premium .km-toolbar-search input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: var(--ds-text);
+  font: inherit;
+  outline: none;
+}
+
+#app-shell.app-shell-premium .km-toolbar-filter {
+  min-width: 140px;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--ds-radius-sm);
+  border: 1px solid var(--ds-border);
+  background: var(--ds-surface-2);
+  color: var(--ds-text);
+  font: inherit;
+}
+
+/* —— Timeline reference sample —— */
+#app-shell.app-shell-premium .tl-ref-layout {
+  margin-top: 1.5rem;
+  padding: 1rem 0;
+  border-top: 1px dashed var(--ds-border);
+}
+
+#app-shell.app-shell-premium .tl-ref-layout h4 {
+  margin: 0 0 1rem;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--ds-muted);
+}
+
+#app-shell.app-shell-premium .tl-ref-year-row {
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+#app-shell.app-shell-premium .tl-ref-year {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--ds-cyan);
+}
+
+#app-shell.app-shell-premium .tl-ref-card {
+  padding: 0.85rem 1rem;
+  border-radius: var(--ds-radius-md);
+  border: 1px solid var(--ds-border-strong);
+  background: var(--ds-surface-2);
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+#app-shell.app-shell-premium .tl-ref-src {
+  font-size: 0.72rem;
+  color: var(--ds-muted);
+  margin-top: 0.5rem;
+}
+
+/* —— Tools hero —— */
+#app-shell.app-shell-premium .tools-page-hero {
+  margin-bottom: 1.5rem;
+}
+
+#app-shell.app-shell-premium .tools-hero-title {
+  font-family: var(--font-display);
+  font-size: 1.5rem !important;
+  font-weight: 700 !important;
+}
+
+#app-shell.app-shell-premium .tools-card-grid .tool-action-card {
+  min-height: 132px;
+  border-radius: var(--ds-radius-md) !important;
+}
+
+#app-shell.app-shell-premium .ref-upload-heading {
+  margin-bottom: 1rem;
+}
+
+#app-shell.app-shell-premium .ref-upload-heading-title {
+  margin: 0 0 0.35rem;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+#app-shell.app-shell-premium .ref-upload-heading-sub {
+  margin: 0;
+  font-size: 0.82rem;
+}
+
+#app-shell.app-shell-premium .tl-ref-muted {
+  opacity: 0.72;
+  pointer-events: none;
+}
+
+/* Timeline toolbar — stack rows (avoids “No events…” + hint overlapping) */
+#app-shell.app-shell-premium #page-timeline .tl-viz-toolbar {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: 0.85rem !important;
+  flex-wrap: nowrap !important;
+  justify-content: flex-start !important;
+}
+
+#app-shell.app-shell-premium .tl-viz-status-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  width: 100%;
+  min-width: 0;
+}
+
+#app-shell.app-shell-premium #page-timeline .tl-event-count,
+#app-shell.app-shell-premium #page-timeline .tl-viz-hint {
+  display: block;
+  white-space: normal;
+  line-height: 1.45;
+  min-width: 0;
+}
+
+#app-shell.app-shell-premium #page-timeline .tl-hero-title {
+  line-height: 1.25 !important;
+  padding: 0.2em 0 0.12em !important;
+  overflow: visible !important;
+}
+
+/* Timeline hero — main.css uses overflow:hidden which clips headings */
+#app-shell.app-shell-premium #page-timeline .tl-hero {
+  overflow: visible !important;
+}
+
+#app-shell.app-shell-premium #page-timeline .tl-hero-copy {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+  z-index: 1;
+}
+
+#app-shell.app-shell-premium #page-timeline .tl-hero-sub {
+  word-break: break-word;
+}
+
+/* Sidebar extraction / filters — long filenames & status lines */
+#app-shell.app-shell-premium #page-timeline .tl-glass-card {
+  overflow: visible;
+}
+
+#app-shell.app-shell-premium #page-timeline .tl-select,
+#app-shell.app-shell-premium #page-timeline .tl-input {
+  max-width: 100%;
+  word-break: break-word;
+}
+
+#app-shell.app-shell-premium #page-timeline .tl-status {
+  overflow: visible !important;
+  white-space: normal !important;
+  word-break: break-word;
+  line-height: 1.45 !important;
+  min-height: 1.25rem;
+}
+
+#app-shell.app-shell-premium #page-timeline .tl-explanation {
+  word-break: break-word;
+  line-height: 1.45 !important;
+}
+
+/* Knowledge Map hero — prevent title clipping from overflow masks */
+#app-shell.app-shell-premium #page-knowledge-map .km-hero {
+  overflow: visible !important;
+}
+
+#app-shell.app-shell-premium #page-knowledge-map .km-hero-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+#app-shell.app-shell-premium #page-knowledge-map .km-hero-title {
+  overflow: visible !important;
+  line-height: 1.2;
+  padding: 0.1em 0;
+  word-break: break-word;
+}
+
+/* Dark scrollbars: right rail + sidebar history */
+#app-shell.app-shell-premium .quick-rail.ref-right-rail,
+#app-shell.app-shell-premium .sidebar .chat-history {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.4) rgba(15, 23, 42, 0.35);
+}
+
+#app-shell.app-shell-premium .quick-rail.ref-right-rail::-webkit-scrollbar,
+#app-shell.app-shell-premium .sidebar .chat-history::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+#app-shell.app-shell-premium .quick-rail.ref-right-rail::-webkit-scrollbar-track,
+#app-shell.app-shell-premium .sidebar .chat-history::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 999px;
+}
+
+#app-shell.app-shell-premium .quick-rail.ref-right-rail::-webkit-scrollbar-thumb,
+#app-shell.app-shell-premium .sidebar .chat-history::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.45);
+  border-radius: 999px;
+}
+
+#app-shell.app-shell-premium .quick-rail.ref-right-rail::-webkit-scrollbar-thumb:hover,
+#app-shell.app-shell-premium .sidebar .chat-history::-webkit-scrollbar-thumb:hover {
+  background: rgba(186, 198, 216, 0.55);
+}

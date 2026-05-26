@@ -1,0 +1,539 @@
+/**
+ * Layout system — balanced 3-column AI workspace (composition-first).
+ * Order: loads after main.css, premium-overrides.css, reference-theme.css
+ */
+
+:root {
+  --space-1: 8px;
+  --space-2: 12px;
+  --space-3: 16px;
+  --space-4: 24px;
+  --space-5: 32px;
+  --space-6: 48px;
+
+  /* Narrower side columns → wider center workspace */
+  --layout-sidebar-w: 232px;
+  --layout-rail-w: 272px;
+  --radius-shell: 24px;
+
+  /* Reading column (~42rem); not full-viewport stretch */
+  --layout-chat-max: 42rem;
+  /* Forms, tools, compare */
+  --layout-content-max: 52rem;
+  /* Documents hero + grids */
+  --layout-docs-max: 68rem;
+  /* KM / Timeline full bleed within center column */
+  --layout-visual-max: 88rem;
+}
+
+/* —— Premium shell framing —— */
+#app-shell.app-shell-premium {
+  padding: var(--space-4);
+  align-items: stretch;
+}
+
+#app-shell.app-shell-premium .workspace {
+  border-radius: var(--radius-shell);
+  min-height: 0;
+  flex: 1 1 0;
+  background:
+    radial-gradient(ellipse 85% 45% at 50% -10%, rgba(139, 92, 246, 0.16), transparent 55%),
+    radial-gradient(ellipse 60% 40% at 100% 50%, rgba(99, 102, 241, 0.08), transparent 50%),
+    color-mix(in srgb, var(--surface) 58%, transparent);
+}
+
+/* Left: fixed glass rail */
+#app-shell.app-shell-premium .sidebar {
+  width: var(--layout-sidebar-w) !important;
+  flex: 0 0 var(--layout-sidebar-w) !important;
+  margin-left: var(--space-2);
+  min-height: 0;
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-shell);
+  padding: var(--space-4) var(--space-3);
+  background:
+    linear-gradient(165deg, color-mix(in srgb, var(--accent2) 18%, transparent) 0%, transparent 52%),
+    color-mix(in srgb, var(--surface) 72%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 18%, transparent),
+    0 24px 64px rgba(0, 0, 0, 0.32),
+    0 0 48px color-mix(in srgb, var(--accent) 14%, transparent),
+    inset 0 1px 0 color-mix(in srgb, #fff 5%, transparent);
+}
+
+#app-shell.app-shell-premium .sidebar-nav {
+  flex-shrink: 0;
+}
+
+#app-shell.app-shell-premium .btn-new-chat {
+  flex-shrink: 0;
+  position: sticky;
+  top: var(--space-2);
+  z-index: 4;
+  margin-top: var(--space-3);
+  margin-bottom: var(--space-2);
+}
+
+#app-shell.app-shell-premium .chat-history {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  margin-top: var(--space-2);
+}
+
+#app-shell.app-shell-premium .sidebar-footer {
+  margin-top: auto;
+  flex-shrink: 0;
+  padding-top: var(--space-3);
+}
+
+/* Center + right */
+#app-shell.app-shell-premium .workspace-stack {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: row;
+}
+
+#app-shell.app-shell-premium .workspace-main {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Context rail */
+#app-shell.app-shell-premium .quick-rail.ref-right-rail {
+  flex: 0 0 var(--layout-rail-w);
+  width: var(--layout-rail-w) !important;
+  padding: var(--space-4) var(--space-4);
+  align-self: stretch;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  border-left: 1px solid color-mix(in srgb, var(--accent) 22%, var(--border));
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--accent2) 12%, transparent) 0%, transparent 42%),
+    color-mix(in srgb, var(--card) 55%, transparent);
+  backdrop-filter: blur(22px);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, #fff 4%, transparent);
+  gap: var(--space-4);
+}
+
+.rail-activity-block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.rail-activity-inner.rail-chip-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.rail-activity-chip {
+  display: flex;
+  gap: var(--space-2);
+  align-items: flex-start;
+  padding: var(--space-2) var(--space-3);
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--accent) 25%, var(--border));
+  background: color-mix(in srgb, var(--card) 88%, transparent);
+  font-size: 0.72rem;
+  line-height: 1.4;
+  color: var(--muted);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+}
+
+.rail-chip-dot {
+  width: 8px;
+  height: 8px;
+  margin-top: 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: color-mix(in srgb, var(--accent) 55%, var(--muted));
+  box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+@media (max-width: 1099px) {
+  #app-shell.app-shell-premium .quick-rail.ref-right-rail {
+    display: none !important;
+  }
+}
+
+@media (min-width: 1100px) {
+  #app-shell.app-shell-premium .quick-rail.ref-right-rail {
+    display: flex !important;
+  }
+}
+
+/* Typography baseline */
+body {
+  line-height: 1.5;
+}
+
+#app-shell.app-shell-premium .header {
+  flex-shrink: 0;
+  padding: var(--space-3) var(--space-5);
+}
+
+.ref-rail-heading,
+.quick-rail-title {
+  margin: 0 0 var(--space-2) !important;
+  font-size: 0.62rem !important;
+  letter-spacing: 0.12em !important;
+}
+
+/* —— Page scroll + centered columns —— */
+#app-shell.app-shell-premium .page:not(#page-chat) {
+  padding: var(--space-5) var(--space-5) var(--space-6);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+#app-shell.app-shell-premium .page-inner {
+  max-width: var(--layout-content-max);
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+#page-documents .page-inner.docs-page {
+  max-width: var(--layout-docs-max);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* Documents: one column when outline is hidden — avoids an empty 260px grid track */
+#app-shell.app-shell-premium #page-documents .docs-layout {
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-4);
+  align-items: start;
+}
+
+@supports selector(:has(*)) {
+  #app-shell.app-shell-premium #page-documents .docs-layout:has(#summary-sidebar:not(.hidden)) {
+    grid-template-columns: minmax(0, 1fr) minmax(260px, 320px);
+  }
+}
+
+#page-knowledge-map .page-inner.km-page,
+#page-timeline .page-inner.timeline-page {
+  max-width: var(--layout-visual-max);
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/* Documents: stats strip */
+.doc-stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+
+@media (max-width: 900px) {
+  .doc-stats-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.doc-stat-chip {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-shell);
+  border: 1px solid color-mix(in srgb, var(--accent) 28%, var(--border));
+  background: linear-gradient(
+      145deg,
+      color-mix(in srgb, var(--accent2) 14%, transparent),
+      color-mix(in srgb, var(--card) 78%, transparent)
+    );
+  backdrop-filter: blur(14px);
+  box-shadow: 0 10px 36px rgba(0, 0, 0, 0.22), 0 0 40px color-mix(in srgb, var(--accent) 8%, transparent);
+}
+
+.doc-stat-value {
+  display: block;
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  font-family: "Plus Jakarta Sans", Inter, system-ui, sans-serif;
+  color: var(--accent);
+}
+
+.doc-stat-label {
+  margin-top: var(--space-1);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.ref-docs-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+/* —— Chat: centered transcript + docked composer —— */
+#app-shell.app-shell-premium #page-chat.page.active,
+#app-shell.app-shell-premium #page-chat.page {
+  padding: 0 !important;
+  overflow: hidden;
+  flex: 1 1 0 !important;
+  min-height: 0 !important;
+  flex-direction: column !important;
+}
+
+.chat-layout {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0;
+  min-height: 0;
+  width: 100%;
+}
+
+.chat-layout .chat-area {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  width: 100%;
+  max-width: var(--layout-chat-max) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  padding: var(--space-5) var(--space-4) var(--space-4) !important;
+  scroll-behavior: smooth;
+}
+
+.composer-dock {
+  flex-shrink: 0;
+  position: sticky;
+  bottom: 0;
+  z-index: 15;
+  width: 100%;
+  padding: var(--space-3) var(--space-5) var(--space-5);
+  display: flex;
+  justify-content: center;
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--bg) 88%, transparent) 0%,
+    transparent 100%
+  );
+}
+
+#app-shell.app-shell-premium #page-chat .composer-dock .composer {
+  width: 100%;
+  max-width: var(--layout-chat-max) !important;
+  margin: 0 !important;
+  border-radius: var(--radius-shell) !important;
+}
+
+/* Messages: premium rhythm */
+#page-chat .msg {
+  width: 100%;
+  padding: 0;
+}
+#page-chat .msg-user {
+  max-width: min(92%, 36rem);
+  margin-left: auto;
+}
+
+#page-chat .msg-assistant .msg-bubble {
+  border-radius: var(--radius-shell);
+}
+
+#page-chat .chat-welcome {
+  min-height: min(52vh, 420px);
+  justify-content: center;
+  padding: var(--space-6) var(--space-4);
+}
+
+#page-chat .chat-welcome h2 {
+  font-size: clamp(1.35rem, 2vw, 1.65rem);
+  max-width: 22rem !important;
+}
+#page-chat .chat-welcome p {
+  max-width: 26rem !important;
+}
+
+/* —— Knowledge map: sidebar | canvas [, detail when open] —— */
+#page-knowledge-map .km-shell {
+  display: grid;
+  gap: var(--space-4);
+  align-items: stretch;
+  flex: 1 1 auto;
+  min-height: 0;
+  /* Default — works when :has is unsupported */
+  grid-template-columns: minmax(240px, 272px) minmax(0, 1fr);
+}
+
+@supports selector(:has(*)) {
+  #page-knowledge-map .km-shell:has(#km-detail:not(.hidden)) {
+    grid-template-columns: minmax(240px, 272px) minmax(0, 1fr) minmax(260px, 304px);
+  }
+}
+
+#page-knowledge-map .km-canvas-strip {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+#page-knowledge-map .km-shell .km-detail-panel.km-meta-rail {
+  position: relative !important;
+  right: auto !important;
+  top: auto !important;
+  width: auto !important;
+  align-self: stretch;
+  max-height: calc(100vh - 168px);
+  overflow-y: auto;
+  padding: var(--space-4) !important;
+  border-radius: var(--radius-shell) !important;
+  margin: 0;
+}
+
+#page-knowledge-map .km-canvas-wrap {
+  min-height: min(74vh, 680px);
+  border-radius: var(--radius-shell) !important;
+}
+
+#page-knowledge-map .km-graph {
+  height: min(70vh, 620px);
+  min-height: 440px !important;
+  border-radius: 0;
+}
+
+/* —— Timeline: sidebar + viz fill workspace height —— */
+#app-shell.app-shell-premium #page-timeline .tl-shell {
+  align-items: stretch;
+  min-height: min(58vh, 560px);
+}
+
+#page-timeline .tl-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  flex: 1 1 auto;
+}
+
+#page-timeline .tl-viz-scroll {
+  flex: 1;
+  overflow-x: hidden;
+}
+
+#page-timeline .tl-axis-wrap {
+  max-width: 52rem;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+}
+
+/* —— Compare: balanced bounded column —— */
+#app-shell.app-shell-premium .compare-page {
+  max-width: var(--layout-visual-max);
+  margin: 0 auto;
+}
+
+.compare-upload-grid {
+  gap: var(--space-4) !important;
+}
+
+/* —— Notebook / tools card rhythm —— */
+#app-shell.app-shell-premium .notebook-page-wrap,
+#app-shell.app-shell-premium .tools-page-wrap {
+  max-width: var(--layout-visual-max);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+}
+
+#app-shell.app-shell-premium .notebook-composer-panel,
+#app-shell.app-shell-premium .tools-advanced-panel,
+#app-shell.app-shell-premium .tool-history-panel {
+  margin-bottom: 0 !important;
+}
+
+/* Notes / AI Notes: wider column + panels stretch */
+#app-shell.app-shell-premium #page-notes .page-inner.notes-page {
+  max-width: var(--layout-visual-max);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+}
+
+@media (min-width: 960px) {
+  #app-shell.app-shell-premium .notes-shell {
+    max-width: none;
+    width: 100%;
+    margin: 0;
+    align-items: stretch;
+    gap: var(--space-4);
+  }
+
+  #app-shell.app-shell-premium .notes-panel-output:not(.hidden) {
+    display: flex;
+    flex-direction: column;
+    min-height: min(420px, 52vh);
+  }
+
+  #app-shell.app-shell-premium .notes-panel-output .notes-markdown {
+    flex: 1 1 auto;
+    min-height: 12rem;
+    overflow: auto;
+  }
+}
+
+/* Stats cards in rail */
+.dash-stat-grid {
+  gap: var(--space-3) !important;
+}
+
+.dash-stat-card {
+  border-radius: 14px !important;
+}
+
+.rail-activity-chip strong {
+  color: var(--text);
+  font-weight: 600;
+  font-size: 0.72rem;
+}
+
+@media (max-width: 960px) {
+  #page-knowledge-map .km-shell {
+    grid-template-columns: 1fr !important;
+  }
+  #page-knowledge-map .km-shell .km-detail-panel.km-meta-rail:not(.hidden) {
+    position: relative !important;
+    inset: auto !important;
+    width: auto !important;
+    max-height: min(52vh, 520px) !important;
+    margin-top: var(--space-3);
+  }
+}
+
+@media (max-width: 720px) {
+  #page-knowledge-map .km-shell .km-detail-panel.km-meta-rail {
+    right: auto !important;
+    left: auto !important;
+    width: auto !important;
+  }
+}

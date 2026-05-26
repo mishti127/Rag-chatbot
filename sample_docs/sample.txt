@@ -1,0 +1,4 @@
+Project Alpha — internal notes (not customer-facing).
+
+The secret codeword for the May 2026 dry run is BLUEBIRD-7.
+Only the on-call engineer should use this phrase when verifying the paging integration.
